@@ -1,13 +1,16 @@
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using UnityRandom = UnityEngine.Random;
+
 namespace Utilities
 {
     public static class BasicExtensions
     {
-        #region Text extensions
+        #region Text
         public static void CopyToClipboard<T>(this T text) where T : TMP_Text
         {
             TextEditor textEditor = new TextEditor();
@@ -36,7 +39,7 @@ namespace Utilities
 
         #endregion
 
-        #region Array extensions
+        #region Array
         public static T[] Append<T>(this T[] array, T item)
         {
             if (array == null)
@@ -72,9 +75,41 @@ namespace Utilities
             var copy = new T[source.Length];
             Array.Copy(source, copy, source.Length);
 
-            T ind1 = copy[index1];
+            T val = copy[index1];
             copy[index1] = copy[index2];
-            copy[index2] = ind1;
+            copy[index2] = val;
+
+            return copy;
+        }
+        #endregion
+
+        #region List
+        public static List<T> Swap<T>(this List<T> source, int index1, int index2)
+        {
+            if (index1 > source.Count - 1 || index2 > source.Count - 1 || index1 < 0 || index2 < 0)
+            {
+                Debug.Log("Swaping List: Index is out of range");
+                return source;
+            }
+            var copy = new List<T>(source);
+
+            T val = copy[index1];   
+            copy[index1] = copy[index2];
+            copy[index2] = val;
+
+            return copy;
+        }
+        public static List<T> SetAsLastIndex<T>(this List<T> source, int index)
+        {
+            if (index > source.Count - 1 || index < 0)
+            {
+                Debug.Log("Swaping List: Index is out of range");
+                return source;
+            }
+            var copy = new List<T>(source);
+
+            copy.RemoveAt(index);
+            copy.Add(source[index]);
 
             return copy;
         }
@@ -147,6 +182,16 @@ namespace Utilities
         }
         #endregion
 
+        #region GameObject
+        public static T GetComponentInChildrenExcludeParent<T>(this GameObject obj, bool includeInactive = false) where T : Component
+        {
+            var components = obj.GetComponentsInChildren<T>(includeInactive);
+
+            return components.FirstOrDefault(childComponent =>
+                childComponent.transform != obj.transform);
+        }
+        #endregion
+
         #region Monobehaviour
 
         public static void SetActive(this MonoBehaviour monoBehaviour, bool value)
@@ -159,7 +204,7 @@ namespace Utilities
         }
         #endregion
 
-        #region Transform extension
+        #region Transform 
         public static T[] GetChilds<T>(this Transform parent) where T : Component
         {
             int count = parent.childCount;
@@ -193,7 +238,7 @@ namespace Utilities
         }
         #endregion
 
-        #region Scripableobject extensions
+        #region Scripableobject
         public static T Clone<T>(this T scrtipableObject) where T : ScriptableObject
         {
             if (scrtipableObject == null)

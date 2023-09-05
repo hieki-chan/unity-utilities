@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -6,40 +9,37 @@ namespace Utilities
 {
     public static class RuntimeUtils
     {
-        public static Vector3 GetPositionByOffset(Transform transform, Vector3 offset)
-            => transform.position + transform.right * offset.x + transform.forward * offset.z + transform.up * offset.y;
- 
-
-        #region Pointer
         /// <summary>
-        /// is pointer over UI
+        /// Asynchronous loop that runs for a specified duration, calling a step function at each step.
         /// </summary>
-        /// <returns></returns>
-        public static bool IsPointerOverUI() => EventSystem.current.IsPointerOverGameObject();
-
-        /// <summary>
-        /// is pointer over ui which has component: Utilities.UI.IgnorePointerOver
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsPointerOverIgnoredUI()
+        /// <param name="stepFunctionCallback">Action to be called at each step of the loop.</param>
+        /// <param name="OnDone">Action to be called when the loop is over.</param>
+        /// <param name="duration">Duration of the loop in seconds.</param>
+        /// <param name="step">step time in second to call the stepFunction</param>
+        /// <param name="cancellationToken"><see cref="CancellationTokenSource"/> to stop the loop prematurely.</param>
+        public async static void DoLoopAsync(Action<float> stepFunctionCallback, Action OnDone, float duration, float step, CancellationTokenSource cancellationToken)
         {
-            PointerEventData eventData = new PointerEventData(EventSystem.current)
+            await Task.Delay((int)(step * 1000));
+            float elapsed = 0;
+            while (elapsed <= duration)
             {
-                position = Input.mousePosition
-            };
-            List<RaycastResult> result = new List<RaycastResult>();
-            EventSystem.current.RaycastAll(eventData, result);
-
-            for (int i = 0; i < result.Count; i++)
-            {
-                if (result[i].gameObject.GetComponent<UI.IgnorePointerOver>())
+                if (!Application.isPlaying || cancellationToken.IsCancellationRequested)
                 {
-                    return true;
+                    return;
                 }
+                elapsed += step;
+                float compensation = Time.time;
+                await Task.Run(() => { stepFunctionCallback?.Invoke(elapsed); });
+                await Task.Delay((int)(step * 1000));
             }
-
-            return false;
+            OnDone?.Invoke();
         }
-        #endregion
+
+        static PooledMonoBehaviour monoBehaviour;
+        public static void CreateUpdater()
+        {
+            if (!monoBehaviour)
+                new GameObject("Mono", typeof(PooledMonoBehaviour));
+        }
     }
 }

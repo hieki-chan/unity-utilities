@@ -1,7 +1,6 @@
+using System;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Utilities
 {
@@ -18,33 +17,17 @@ namespace Utilities
 
         public void SetActiveTrue(float t)
         {
-            WaitForSecs(() =>
-            {
-                gameObject.SetActive(true);
-            }, t, Time.deltaTime, tokenSource);
+            WaitForSecs(() => gameObject.SetActive(true), t);
         }
+
         public void SetActiveFalse(float t)
         {
-            WaitForSecs(() =>
-            {
-                gameObject.SetActive(false);
-            }, t, Time.deltaTime, tokenSource);
+            WaitForSecs(() => gameObject.SetActive(false), t);
         }
 
-
-        public async void WaitForSecs(UnityAction onDone, float duration, float step, CancellationTokenSource cancellationToken)
+        public void WaitForSecs(Action OnDone, float delay)
         {
-            float elapsed = 0;
-            while (elapsed < duration)
-            {
-                if (!Application.isPlaying || cancellationToken.IsCancellationRequested)
-                {
-                    return;
-                }
-                elapsed -= step;
-                await Task.Delay((int)step * 1000);
-            }
-            onDone?.Invoke();
+            RuntimeUtils.DoLoopAsync(null, OnDone, delay, Time.deltaTime, tokenSource);
         }
 
         private void OnDestroy()
