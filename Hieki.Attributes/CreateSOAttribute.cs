@@ -24,7 +24,7 @@ public class CreateSOAttributeDrawer : PropertyDrawer
         EditorGUI.ObjectField(position, property, label);
 
         position.x += position.width;
-        position.width += 80;
+        position.width = 80;
         if (GUI.Button(position, new GUIContent("Create")))
         {
             var className = attribute as CreateSOAttribute;
