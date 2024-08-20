@@ -102,5 +102,47 @@ namespace Hieki.Utils
 
             return list ;
         }
+        
+        public static void SortDes<T, TKey>(this List<T> list, Func<T, TKey> keySelector) where TKey : IComparable<TKey>
+        {
+            for (int i = 0; i < list.Count - 1; i++)
+            {
+                for (int j = 0; j < list.Count - i - 1; j++)
+                {
+                    TKey key1 = keySelector(list[j]);
+                    TKey key2 = keySelector(list[j + 1]);
+
+                    if (key1.CompareTo(key2) >= 0)
+                    {
+                        continue;
+                    }
+
+                    T temp = list[j];
+                    list[j] = list[j + 1];
+                    list[j + 1] = temp;
+                }
+            }
+        }
+
+        public static void SortAsc<T, TKey>(this List<T> list, Func<T, TKey> keySelector) where TKey : IComparable<TKey>
+        {
+            for (int i = 0; i < list.Count - 1; i++)
+            {
+                for (int j = 0; j < list.Count - i - 1; j++)
+                {
+                    TKey key1 = keySelector(list[j]);
+                    TKey key2 = keySelector(list[j + 1]);
+
+                    if (key2.CompareTo(key1) >= 0)
+                    {
+                        continue;
+                    }
+
+                    T temp = list[j];
+                    list[j] = list[j + 1];
+                    list[j + 1] = temp;
+                }
+            }
+        }
     }
 }
