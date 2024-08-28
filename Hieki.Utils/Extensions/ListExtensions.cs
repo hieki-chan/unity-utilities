@@ -27,7 +27,7 @@ namespace Hieki.Utils
         /// </summary>
         public static List<T> RemoveAtSwapBack<T>(this List<T> source, int index)
         {
-            if (source == null || index < 0 || index > source.Count)
+            if (source == null || index < 0 || index >= source.Count)
             {
                 return source;
             }
