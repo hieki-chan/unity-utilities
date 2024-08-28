@@ -12,7 +12,7 @@ namespace Hieki.Utils
         {
             if (index1 >= source.Count || index2 >= source.Count || index1 < 0 || index2 < 0)
             {
-                Debug.Log("Swaping List: Index is out of range");
+                Debug.LogWarning("Swaping List: Index is out of range");
                 return;
             }
 
@@ -29,6 +29,9 @@ namespace Hieki.Utils
         {
             if (source == null || index < 0 || index >= source.Count)
             {
+#if UNITY_EDITOR
+                Debug.LogWarning($"Remove Swap Back: index is out of range: {index}");
+#endif
                 return source;
             }
 
