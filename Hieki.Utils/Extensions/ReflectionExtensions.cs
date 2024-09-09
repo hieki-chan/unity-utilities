@@ -25,5 +25,39 @@ namespace Hieki.Utils
 
             return (V)(info.GetValue(target));
         }
+
+        
+        public static bool SetField<V>(this object target, V value, string fieldName, Type baseType)
+        {
+            Type type = target.GetType();
+            FieldInfo[] fields = null;
+
+            while (type != null)
+            {
+                if(type == baseType)
+                {
+                    fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField);
+
+                    break;
+                }
+                type = type.BaseType;
+            }
+
+            //Debug.Log(type);
+
+            if (fields == null)
+                return false;
+
+            foreach (var field in fields)
+            {
+                if (fieldName == field.Name)
+                {
+                    field.SetValue(target, value);
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
