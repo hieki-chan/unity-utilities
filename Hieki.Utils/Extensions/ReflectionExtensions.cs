@@ -26,22 +26,26 @@ namespace Hieki.Utils
             return (V)(info.GetValue(target));
         }
 
-        
-        public static bool SetField<V>(this object target, V value, string fieldName, Type baseType)
+        public static bool SetField<V>(this object target, V value, string fieldName, Type baseType = null)
         {
             Type type = target.GetType();
             FieldInfo[] fields = null;
 
-            while (type != null)
+            if(baseType != null)
             {
-                if(type == baseType)
+                while (type != null)
                 {
-                    fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField);
+                    if (type == baseType)
+                    {
+                        fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField);
 
-                    break;
+                        break;
+                    }
+                    type = type.BaseType;
                 }
-                type = type.BaseType;
             }
+            else
+                fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField);
 
             //Debug.Log(type);
 
