@@ -26,7 +26,7 @@ namespace Hieki.Utils
             return (V)(info.GetValue(target));
         }
 
-        public static bool SetField<V>(this object target, V value, string fieldName, Type baseType = null)
+        public static bool SetField(this object target, object value, string fieldName, Type baseType = null)
         {
             Type type = target.GetType();
             FieldInfo[] fields = null;
@@ -62,6 +62,11 @@ namespace Hieki.Utils
             }
 
             return false;
+        }
+
+        public static bool SetField<T>(this object target, object value, string fieldName)
+        {
+            return SetField(target, value, fieldName, typeof(T));
         }
     }
 }
